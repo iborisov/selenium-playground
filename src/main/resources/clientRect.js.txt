@@ -1,0 +1,4 @@
+var range = document.createRange();
+range.selectNodeContents(document.getElementById('test'));
+var rects = range.getClientRects();
+return rects;
