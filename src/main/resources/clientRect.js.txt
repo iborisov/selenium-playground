@@ -1,4 +1,52 @@
-var range = document.createRange();
-range.selectNodeContents(document.getElementById('test'));
-var rects = range.getClientRects();
-return rects;
+var textNodes = textNodesUnder(document.body),
+    textRects = getNodesRects(textNodes),
+    imgElems = document.getElementsByTagName('img'),
+    imgRects = getNodesRects(imgElems);
+
+function getNodesRects(nodes) {
+    var res = [],
+        i = 0,
+        len = textNodes.length,
+        currNode = null,
+        currRect = null;
+    for (; i < len; i++) {
+        currNode = nodes[i];
+        if (!currNode) {
+            continue;
+        }
+        if (currNode.nodeType === Node.TEXT_NODE) {
+            currRect = getTextNodeBoundingRect(currNode);
+        } else {
+            currRect = currNode.getBoundingClientRect();
+        }
+        if (currRect.width > 0 && currRect.height > 0) {
+            res.push(currRect);
+        }
+    }
+    return res;
+}
+
+function getTextNodeBoundingRect(textNode) {
+    var rangeTmp = document.createRange(),
+        rect = null;
+    rangeTmp.selectNodeContents(textNode);
+    rect = rangeTmp.getBoundingClientRect();
+    return rect;
+}
+
+// From: http://stackoverflow.com/questions/10730309/find-all-text-nodes-in-html-page
+function textNodesUnder(el) {
+    var nextNode, result = [],
+        walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT, null, false);
+    nextNode = walker.nextNode();
+    while (nextNode) {
+        result.push(nextNode);
+        nextNode = walker.nextNode();
+    }
+    return result;
+}
+
+return {
+    textRects: textRects,
+    imgRects: imgRects
+};

@@ -1,3 +1,5 @@
+package tst;
+
 import com.google.common.base.Charsets;
 import com.google.common.io.Resources;
 import org.openqa.selenium.JavascriptExecutor;
@@ -7,8 +9,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
-import java.util.List;
-import java.util.Map;
 
 public class Example {
     private static final Logger LOG = LoggerFactory.getLogger(Example.class);
@@ -21,19 +21,25 @@ public class Example {
         final JavascriptExecutor js = (JavascriptExecutor) driver;
 
         final File currDir = new File("./");
-        final String htmlPath = "file:///" + currDir.getAbsolutePath() + "/test1.html";
+//        final String htmlPath = "file:///" + currDir.getAbsolutePath() + "/test1.html";
+        final String htmlPath = "http://habrahabr.ru/";
+        LOG.info("Opening {}...", htmlPath);
         driver.get(htmlPath);
+        LOG.info("Opened {}", htmlPath);
 
         LOG.info("Executing JS:\n{}", jsGetClientRectText);
         @SuppressWarnings("unchecked")
-        final List<Map<String, ?>> jsResult = (List<Map<String, ?>>) js.executeScript(jsGetClientRectText);
+        final Object jsResult = js.executeScript(jsGetClientRectText);
+        LOG.info("Executed JS");
 
-        @SuppressWarnings("unchecked")
-        final Map<String, Long> rect0 = (Map<String, Long>) jsResult.get(0);
+        LOG.info("jsResult: {}", jsResult);
 
-        LOG.info("rect0: {}", rect0);
+        //@SuppressWarnings("unchecked")
+        //final Map<String, Long> rect0 = (Map<String, Long>) jsResult.get(0);
 
+        //LOG.info("rect0: {}", rect0);
 
+driver.close();
         driver.quit();
     }
 }
