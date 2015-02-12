@@ -25,10 +25,10 @@ public class TextImgOverlappingDetectorTest {
                 createRect(40, 40, 60, 60)));
         assertFalse(areRectsOverlap(
                 createRect(10, 10, 30, 30),
-                createRect(0, 0, 10, 10)));
+                createRect(0, 0, 5, 5)));
         assertFalse(areRectsOverlap(
                 createRect(10, 10, 30, 30),
-                createRect(0, 10, 10, 50)));
+                createRect(0, 10, 5, 50)));
     }
 
     @Test
