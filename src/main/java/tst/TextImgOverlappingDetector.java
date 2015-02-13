@@ -2,7 +2,11 @@ package tst;
 
 import com.google.common.collect.ImmutableMap;
 import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.WebDriver;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import javax.xml.soap.Text;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -12,11 +16,13 @@ import java.util.List;
 import java.util.Map;
 
 public final class TextImgOverlappingDetector {
+    private static final Logger LOG = LoggerFactory.getLogger(TextImgOverlappingDetector.class);
+
     private TextImgOverlappingDetector() {
-        throw new RuntimeException("You don't need to construct this.");
+        throw new RuntimeException("You don't want to construct this.");
     }
 
-    private static final String JS_TEXT_AND_IMG_NODES_RECTS = readFileAsString("textAndImgNodesRects.js.txt");
+    private static final String JS_TEXT_AND_IMG_NODES_RECTS = readFileAsString("src/main/resources/clientRect.js.txt");
     private static final NumberDblValComparator NUMBER_DBL_VAL_COMPARATOR = new NumberDblValComparator();
     public static final String TEXT_RECTS_KEY = "textRects";
     public static final String IMG_RECTS_KEY = "imgRects";
@@ -34,14 +40,42 @@ public final class TextImgOverlappingDetector {
         return ImmutableMap.of(KEY_TOP, top, KEY_LEFT, left, KEY_BOTTOM, bottom, KEY_RIGHT, right);
     }
 
-    public static int detect(final JavascriptExecutor jsExecutor) {
-        int result = 0;
+    public static int detect(final WebDriver webDriver, final String urlToCheck) {
+        try {
+            final JavascriptExecutor js = (JavascriptExecutor) webDriver;
+            LOG.info("Opening {} ...", urlToCheck);
+            webDriver.get(urlToCheck);
+            final int result = TextImgOverlappingDetector.detect(js);
+            LOG.info("Detect result for {} is {}.", urlToCheck, result);
+            return result;
+        } catch (Exception e) {
+            LOG.error("Error", e);
+            throw new RuntimeException("Error detecting text-img overlapping", e);
+        } finally {
+            webDriver.close();
+        }
+    }
 
+    /**
+     * @param jsExecutor WebDriver with opened page to test.
+     * @return 1 if some text and img nodes are overlapping, 0 otherwise.
+     */
+    public static int detect(final JavascriptExecutor jsExecutor) {
+        if (JS_TEXT_AND_IMG_NODES_RECTS.isEmpty()) {
+            throw new IllegalArgumentException("JS file to get nodes rectangles didn't read. Can't continue.");
+        }
         @SuppressWarnings("unchecked")
         final Map<String, List<Map<String, Number>>> jsRes = (Map<String, List<Map<String, Number>>>) jsExecutor.executeScript(JS_TEXT_AND_IMG_NODES_RECTS);
-        // TODO: implement.
-
-        return result;
+        final List<Map<String, Number>> textRects = jsRes.get(TEXT_RECTS_KEY);
+        final List<Map<String, Number>> imgRects = jsRes.get(IMG_RECTS_KEY);
+        for (Map<String, Number> imgRect : imgRects) {
+            for (Map<String, Number> textRect : textRects) {
+                if (areRectsOverlap(imgRect, textRect)) {
+                    return 1;
+                }
+            }
+        }
+        return 0;
     }
 
     /**
