@@ -3,10 +3,11 @@ package tst;
 import com.google.common.collect.ImmutableMap;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.support.ui.ExpectedCondition;
+import org.openqa.selenium.support.ui.WebDriverWait;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.xml.soap.Text;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -50,9 +51,8 @@ public final class TextImgOverlappingDetector {
             final JavascriptExecutor js = (JavascriptExecutor) webDriver;
             LOG.info("Opening {} ...", urlToCheck);
             webDriver.get(urlToCheck);
-            LOG.info(webDriver.getPageSource());
             final int result = TextImgOverlappingDetector.detect(js);
-            LOG.info("Detect result for {} is {}.", urlToCheck, result);
+            LOG.info("img-text overlapping detection result for {} is {}.", urlToCheck, result);
             return result;
         } catch (Exception e) {
             LOG.error("Error", e);
@@ -77,7 +77,8 @@ public final class TextImgOverlappingDetector {
         for (Map<String, Number> imgRect : imgRects) {
             for (Map<String, Number> textRect : textRects) {
                 if (areRectsOverlap(imgRect, textRect)) {
-                    LOG.info("Found overlapping for text node: {}", textRect);
+                    LOG.info("Found overlapping for text node: {}\nand image node: {}",
+                            textRect, imgRect);
                     return 1;
                 }
             }
@@ -99,18 +100,18 @@ public final class TextImgOverlappingDetector {
 
     public static boolean areRectsOverlap(final Map<String, Number> r1,
                                           final Map<String, Number> r2) {
-        return !(greater(r2.get(KEY_LEFT), r1.get(KEY_RIGHT))
-                || less(r2.get(KEY_RIGHT), r1.get(KEY_LEFT))
-                || greater(r2.get(KEY_TOP), r1.get(KEY_BOTTOM))
-                || less(r2.get(KEY_BOTTOM), r1.get(KEY_TOP)));
+        return !(greq(r2.get(KEY_LEFT), r1.get(KEY_RIGHT))
+                || leq(r2.get(KEY_RIGHT), r1.get(KEY_LEFT))
+                || greq(r2.get(KEY_TOP), r1.get(KEY_BOTTOM))
+                || leq(r2.get(KEY_BOTTOM), r1.get(KEY_TOP)));
     }
 
-    public static boolean less(final Number n1, final Number n2) {
-        return NUMBER_DBL_VAL_COMPARATOR.compare(n1, n2) < 0;
+    public static boolean leq(final Number n1, final Number n2) {
+        return NUMBER_DBL_VAL_COMPARATOR.compare(n1, n2) <= 0;
     }
 
-    public static boolean greater(final Number n1, final Number n2) {
-        return NUMBER_DBL_VAL_COMPARATOR.compare(n1, n2) > 0;
+    public static boolean greq(final Number n1, final Number n2) {
+        return NUMBER_DBL_VAL_COMPARATOR.compare(n1, n2) >= 0;
     }
 
     public static boolean lessOrEqual(final Number n1, final Number n2) {

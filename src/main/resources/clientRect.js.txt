@@ -19,6 +19,9 @@ function getNodesRects(nodes) {
             currRect.text = currNode.nodeValue;
         } else {
             currRect = currNode.getBoundingClientRect();
+            currRect.src = currNode.src;
+            currRect.title = currNode.title;
+            currRect.alt = currNode.alt;
         }
         if (currRect.width > 0 && currRect.height > 0) {
             res.push(currRect);

@@ -32,6 +32,13 @@ public class TextImgOverlappingDetectorTest {
     }
 
     @Test
+    public void test_dont_overlap_habr2() {
+        assertFalse(areRectsOverlap(
+                createRect(2828, 1046, 2857, 1215),
+                createRect(2836, 1215, 2862, 1231)));
+    }
+
+    @Test
     public void test_r1_includes_r2_means_overlapped() throws Exception {
         assertTrue(areRectsOverlap(
                 createRect(0, 0, 50, 50),
