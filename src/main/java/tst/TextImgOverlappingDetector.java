@@ -40,11 +40,17 @@ public final class TextImgOverlappingDetector {
         return ImmutableMap.of(KEY_TOP, top, KEY_LEFT, left, KEY_BOTTOM, bottom, KEY_RIGHT, right);
     }
 
+    /**
+     * @param webDriver  WebDriver to open given URL and execute JavaScript.
+     * @param urlToCheck URL to check
+     * @return 1 if some text and img nodes are overlapping, 0 otherwise.
+     */
     public static int detect(final WebDriver webDriver, final String urlToCheck) {
         try {
             final JavascriptExecutor js = (JavascriptExecutor) webDriver;
             LOG.info("Opening {} ...", urlToCheck);
             webDriver.get(urlToCheck);
+            LOG.info(webDriver.getPageSource());
             final int result = TextImgOverlappingDetector.detect(js);
             LOG.info("Detect result for {} is {}.", urlToCheck, result);
             return result;
@@ -71,6 +77,7 @@ public final class TextImgOverlappingDetector {
         for (Map<String, Number> imgRect : imgRects) {
             for (Map<String, Number> textRect : textRects) {
                 if (areRectsOverlap(imgRect, textRect)) {
+                    LOG.info("Found overlapping for text node: {}", textRect);
                     return 1;
                 }
             }

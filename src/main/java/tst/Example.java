@@ -17,8 +17,9 @@ public class Example {
         final String htmlGood = "file:///" + currDir.getAbsolutePath() + "/src/test/resources/test_good.html";
         final String htmlBad = "file:///" + currDir.getAbsolutePath() + "/src/test/resources/test_bad.html";
 
-        TextImgOverlappingDetector.detect(driver, htmlGood);
-        TextImgOverlappingDetector.detect(driver, htmlBad);
+//        TextImgOverlappingDetector.detect(driver, htmlGood);
+//        TextImgOverlappingDetector.detect(driver, htmlBad);
+        System.out.println(TextImgOverlappingDetector.detect(driver, "http://habrahabr.ru/"));
 
         driver.quit();
     }

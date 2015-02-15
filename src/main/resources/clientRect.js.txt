@@ -16,6 +16,7 @@ function getNodesRects(nodes) {
         }
         if (currNode.nodeType === Node.TEXT_NODE) {
             currRect = getTextNodeBoundingRect(currNode);
+            currRect.text = currNode.nodeValue;
         } else {
             currRect = currNode.getBoundingClientRect();
         }
